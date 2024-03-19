@@ -1,18 +1,18 @@
-import React, { createContext, useContext, useState } from 'react';
+import React, { useState } from 'react';
 
 // Create context
-const TetrominoSelectionContext = createContext();
+export const Context = React.createContext();
 
 // Context provider component
-export const TetrominoSelectionProvider = ({ children }) => {
+export const ContextProvider  = ({ children }) => {
   const [selectedTetrominos, setSelectedTetrominos] = useState([]);
 
   return (
-    <TetrominoSelectionContext.Provider value={{ selectedTetrominos, setSelectedTetrominos }}>
+    <Context.Provider value={{ selectedTetrominos, setSelectedTetrominos }}>
       {children}
-    </TetrominoSelectionContext.Provider>
+    </Context.Provider>
   );
 };
 
 // Custom hook to access context
-export const useTetrominoSelection = () => useContext(TetrominoSelectionContext);
+// export const useTetrominoSelection = () => useContext(TetrominoSelectionContext);

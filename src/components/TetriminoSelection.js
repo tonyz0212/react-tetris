@@ -1,17 +1,22 @@
-import React, { useState } from 'react';
+import React, { useContext } from 'react';
 import { TETROMINOS } from '../tetrominoes';
 import { StyledStartButton } from './styles/StyledStartButton';
+import { Context } from "../components/TetrominoSelectionContext";
 
-const TetrominoSelection = () => {
-    const [selectedTetrominos, setSelectedTetrominos] = useState([]);
+const TetrominoSelection = ({onConfirmation}) => {
+    const { selectedTetrominos, setSelectedTetrominos } = useContext(Context);
     const handleToggleTetromino = tetromino => {
-        console.log(tetromino);
+        
         if (selectedTetrominos.includes(tetromino)) {
             setSelectedTetrominos(prev => prev.filter(item => item !== tetromino));
         } else {
             setSelectedTetrominos(prev => [...prev, tetromino]);
         }
     };
+
+    const confirmSelection = () => {
+        onConfirmation(selectedTetrominos);
+    }
 
     
 
@@ -43,7 +48,7 @@ const TetrominoSelection = () => {
             </div>
 
             <div></div>
-            <StyledStartButton>Confirm</StyledStartButton>
+            <StyledStartButton onClick={confirmSelection}>Confirm</StyledStartButton>
 
         </div>
     );

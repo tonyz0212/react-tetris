@@ -1,10 +1,11 @@
-import { useCallback, useState } from 'react';
+import { useCallback, useState} from 'react';
 
 import { TETROMINOS, randomTetromino} from '../tetrominoes';
 import { checkCollision, STAGE_WIDTH } from '../gameHelper';
 
-
-export const usePlayer = () => {
+export const usePlayer = (selectedTetrominos) => {
+  // console.log("Use player " +  selectedTetrominos);
+  
     // 声明了一个名为 player 的状态变量，它包含了玩家的位置 (pos)、当前控制的俄罗斯方块形状 (tetromino) 和碰撞状态 (collided)
     const [player, setPlayer] = useState({
         pos: { x: 0, y: 0 },
@@ -19,7 +20,7 @@ export const usePlayer = () => {
           pos: { x: (prev.pos.x + x), y: (prev.pos.y + y)},
           collided
         }))
-        console.log('移动后的y:', player.pos.y); // 输出移动后的x值
+        // console.log('移动后的y:', player.pos.y); // 输出移动后的x值
     };
 
     const rotate = (matrix, dir) => {
@@ -51,15 +52,19 @@ export const usePlayer = () => {
         setPlayer(clonedPlayer);
       };
 
+    // const { selectedTetrominos, setSelectedTetrominos } = useContext(Context);
+
     // 这里使用了useCallback来确保resetPlayer函数只在初始化时创建一次，以避免不必要的重复创建，提高性
     const resetPlayer = useCallback(() => {
+      
+        // console.log( "use Callback ", selectedTetrominos);
         setPlayer({
             pos: { x: STAGE_WIDTH / 2 - 2, y: 0 },
-            tetromino: randomTetromino().shape,
+            tetromino: randomTetromino(selectedTetrominos).shape,
             collided: false
 
         })
-    }, [])
+    }, [selectedTetrominos])
 
     return [player, updatePlayerPos, resetPlayer, playerRotate];
 }

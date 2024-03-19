@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState} from 'react';
 import Stage from './Stage';
 import { createStage, checkCollision } from '../gameHelper';
 import Display from './Display';
@@ -12,7 +12,6 @@ import { useInterval } from '../hooks/useInterval';
 import { usePlayer } from '../hooks/usePlayer';
 import { useStage } from '../hooks/useStage';
 import { useGameStatus } from '../hooks/useGameStatus';
-import { StyledStartButton } from './styles/StyledStartButton';
 import TetriminoSelection from './TetriminoSelection';
 
 const Tetris = () => {
@@ -21,14 +20,9 @@ const Tetris = () => {
     const [isPaused, setIsPaused] = useState(false);
     const [isStarted, setIsStarted] = useState(false);
     const [selectedMode, setSelectedMode] = useState(null);
-    const [selectedTetriminos, setSelectedTetriminos] = useState([]);
-    const [isCustomizeMode, setIsCustomizeMode] = useState(false);
+    const [selectedTetrominos, setSelectedTetrominos] = useState([]);
     const [finishedSelectingTetriminos, setfinishedSelectingTetriminos] = useState(false);
-    
-    
-
-
-    const [player, updatePlayerPos, resetPlayer, playerRotate] = usePlayer();
+    const [player, updatePlayerPos, resetPlayer, playerRotate] = usePlayer(selectedTetrominos);
     const [stage, setStage, rowsCleared] = useStage(player, resetPlayer);
     const [score, setScore, rows, setRows, level, setLevel] = useGameStatus(
         rowsCleared
@@ -42,7 +36,7 @@ const Tetris = () => {
     }
 
     const startGame = () => {
-        console.log("test");
+        console.log("Starting the game");
         // Reset everything
         setStage(createStage());
         setDropTime(1000);
@@ -66,14 +60,11 @@ const Tetris = () => {
 
     const handleModeSelection = mode => {
         setSelectedMode(mode);
-        if (mode === 'customize') {
-            setIsCustomizeMode(true);
-        }
-    };
+        };
 
     const handleTetriminoSelection = tetriminos => {
-        setSelectedTetriminos(tetriminos);
-        setIsCustomizeMode(false); // Exit customize mode after selecting tetriminos
+        setSelectedTetrominos(tetriminos);
+        // setIsCustomizeMode(false); // Exit customize mode after selecting tetriminos
     };
 
 
@@ -102,13 +93,13 @@ const Tetris = () => {
     const hardDrop = () => {
         let pot = 0;
         while (!checkCollision(player, stage, { x: 0, y: pot })) {
-        //    setDropTime(5);
-           pot += 1;
+            //    setDropTime(5);
+            pot += 1;
         }
-     
-        updatePlayerPos({ x: 0, y: pot-1, collided: true });
-     }
-     
+
+        updatePlayerPos({ x: 0, y: pot - 1, collided: true });
+    }
+
     const keyUp = ({ keyCode }) => {
         if (!gameOver) {
             if (keyCode === 40) {
@@ -124,7 +115,7 @@ const Tetris = () => {
 
     const move = (e) => {
         if (!gameOver) {
-            e.preventDefault(); 
+            e.preventDefault();
             // left arrow code is 37
             if (e.keyCode === 37) {
                 movePlayerHorizontal(-1);
@@ -143,36 +134,47 @@ const Tetris = () => {
     useInterval(() => {
         drop();
     }, dropTime);
+
+    const handleConfirmation = (selectedTetrominos) => {
+        // Do something when confirmation is received from TetriminoSelection
+        setfinishedSelectingTetriminos(true);       
+        // onConfirmation(selectedTetrominos);
+        setSelectedTetrominos(selectedTetrominos);
+        console.log("parent" + selectedTetrominos);
+      };
+
     return (
         <StyledTetrisWrapper id="tetris-wrapper" role="button" tabIndex="0" onKeyDown={e => move(e)} onKeyUp={keyUp}>
             <StyledTetris>
-            {selectedMode === null && <ModeSelection onSelectMode={handleModeSelection} />}
-            {selectedMode === 'customize' && <TetriminoSelection/>}
-    { (selectedMode === 'regular' || (selectedMode === 'customize' && finishedSelectingTetriminos)) && (
-        <>
-            <Stage stage={stage} />
-            <aside>
-                {gameOver ? (
-                    <Display gameOver={gameOver} text="Game Over" />
-                ) : (
-                    <div>
-                        <Display text={`Score: ${score}`} />
-                        <Display text={`rows: ${rows}`} />
-                        <Display text={`Level: ${level}`} />
-                    </div>
+                {selectedMode === null && <ModeSelection onSelectMode={handleModeSelection} />}
+                {selectedMode === 'customize' && !finishedSelectingTetriminos &&
+                <TetriminoSelection onConfirmation={handleConfirmation} />}
+                {(selectedMode === 'regular' || (selectedMode === 'customize' && finishedSelectingTetriminos)) && (
+                    <>
+                        <Stage stage={stage} />
+                        <aside>
+                            {gameOver ? (
+                                <Display gameOver={gameOver} text="Game Over" />
+                            ) : (
+                                <div>
+                                    <Display text={`Score: ${score}`} />
+                                    <Display text={`rows: ${rows}`} />
+                                    <Display text={`Level: ${level}`} />
+                                </div>
+                            )}
+                            <StartButton
+                                callback={startGame}
+                                onPauseResume={pauseResumeGame}
+                                isPaused={isPaused}
+                                isStarted={isStarted}
+                            />
+                        </aside>
+                    </>
                 )}
-                <StartButton
-                    callback={startGame}
-                    onPauseResume={pauseResumeGame}
-                    isPaused={isPaused}
-                    isStarted={isStarted}
-                />
-            </aside>
-        </>
-    )}
-</StyledTetris>
+            </StyledTetris>
 
         </StyledTetrisWrapper>
+        
     );
 };
 

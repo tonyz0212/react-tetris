@@ -1,3 +1,4 @@
+
 export const TETROMINOS = {
     0: { shape: [[0]], color: '0, 0, 0' },
     I: {
@@ -30,11 +31,15 @@ export const TETROMINOS = {
     },
   };
   
+export const randomTetromino = (selectedTetrominos) => {
   
-  export const randomTetromino = () => {
-    let tetrominos = 'IJLOSTZ';
-    const randTetromino =
-      tetrominos[Math.floor(Math.random() * tetrominos.length)];
-    return TETROMINOS[randTetromino];
-  };
-  
+  let tetrominos = 'IJLOSTZ';
+  let concatenatedString = selectedTetrominos.join('');
+  if ( concatenatedString.length > 0 ) {
+    tetrominos = concatenatedString;
+  }
+  const randTetromino = tetrominos[Math.floor(Math.random() * tetrominos.length)];
+
+  return TETROMINOS[randTetromino];
+};
+
